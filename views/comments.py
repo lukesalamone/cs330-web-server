@@ -6,23 +6,27 @@ import json
 
 def serialize_queryset(queryset):
     serialized_list = [
-        json.dumps(item) for item in queryset
+        item.to_dict() for item in queryset
     ]
     return serialized_list
 
 class CommentListEndpoint(Resource):
-
     def get(self):
-        data = models.Comment.objects
-        return Response(data.__dict__, mimetype="application/json", status=200)
+        keyword = request.args.get('keyword')
+        if keyword:
+            data = models.Comment.objects.filter(
+                Q(comment__icontains=keyword) |
+                Q(author__icontains=keyword)
+            )
+        else:
+            data = models.Comment.objects
+
+        data = serialize_queryset(data)
+        return Response(json.dumps(data), mimetype="application/json", status=200)
 
     def post(self):
         body = request.get_json()
         comment = models.Comment(**body).save()
-        serialized_data = {
-            'id': str(comment.id),
-            'message': 'Comment {0} successfully created.'.format(comment.id)
-        }
         return Response(comment.to_json(), mimetype="application/json", status=201)
 
 class CommentDetailEndpoint(Resource):

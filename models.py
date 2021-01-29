@@ -44,7 +44,7 @@ class Comment(Document):
                 'url': server_url
             })
         return d
-    
+
     def to_json(self, path=None):
         return json.dumps(self.to_dict())
 
@@ -54,4 +54,3 @@ class Comment(Document):
 #     name = StringField(required=True, unique=True)
 #     casts = ListField(StringField(), required=True)
 #     genres =ListField(StringField(), required=True)
-        
