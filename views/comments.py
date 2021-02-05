@@ -11,21 +11,16 @@ def serialize_queryset(queryset):
     return serialized_list
 
 class CommentListEndpoint(Resource):
-    def get(self):
-        keyword = request.args.get('keyword')
-        if keyword:
-            data = models.Comment.objects.filter(
-                Q(comment__icontains=keyword) |
-                Q(author__icontains=keyword)
-            )
-        else:
-            data = models.Comment.objects
-
+    def get(self, post_id):
+        data = models.Comment.objects.filter(post=post_id)
         data = serialize_queryset(data)
         return Response(json.dumps(data), mimetype="application/json", status=200)
 
-    def post(self):
+    def post(self, post_id):
+        print(post_id)
         body = request.get_json()
+        print(body)
+        body['post'] = post_id
         comment = models.Comment(**body).save()
         return Response(comment.to_json(), mimetype="application/json", status=201)
 
@@ -48,9 +43,10 @@ class CommentDetailEndpoint(Resource):
         return Response(json.dumps(serialized_data), mimetype="application/json", status=200)
 
     def get(self, id):
-        comment = models.Comment.objects.get(id=id)
+        print(id)
+        comment = models.Comment.objects.get(post=id)
         return Response(comment.to_json(), mimetype="application/json", status=200)
 
 def initialize_routes(api):
-    api.add_resource(CommentListEndpoint, '/api/comments', '/api/comments/')
+    api.add_resource(CommentListEndpoint, '/api/posts/<post_id>/comments', '/api/posts/<post_id>/comments/')
     api.add_resource(CommentDetailEndpoint, '/api/comments/<id>', '/api/comments/<id>/')
