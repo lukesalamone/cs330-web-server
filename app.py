@@ -34,7 +34,9 @@ def get_single_post():
 # routes from other files:
 posts.initialize_routes(api)
 comments.initialize_routes(api)
-util.initialize_routes(api)
+
+# debug endpoint
+# util.initialize_routes(api)
 
 
 if __name__ == "__main__":
